@@ -787,7 +787,7 @@
     }
 
     .price-row {
-      @apply flex gap-4;
+      @apply flex gap-4 items-center;
 
       h1 {
         @apply text-3xl sm:text-5xl xl:text-6xl font-semibold;

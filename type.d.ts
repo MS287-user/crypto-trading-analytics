@@ -1,5 +1,16 @@
 type OHLCData = [number, number, number, number, number];
 
+type OHLCDataLive = [number, number, number, number, number];
+
+interface OHLCDataLiveAttributes {
+  ohlcv_list: OHLCDataLive[];
+}
+
+interface OHLCDataLiveResponse {
+  id: string;
+  attributes: OHLCDataLiveAttributes;
+}
+
 interface NextPageProps {
   params: Promise<{ [key: string]: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -7,7 +18,7 @@ interface NextPageProps {
 
 interface CandlestickChartProps {
   data?: OHLCData[];
-  liveOhlcv?: OHLCData | null;
+  liveOhlcv?: OHLCDataLive | null;
   coinId: string;
   height?: number;
   children?: React.ReactNode;
@@ -234,6 +245,8 @@ interface LiveDataProps {
   poolId: string;
   coin: CoinDetailsData;
   coinOHLCData?: OHLCData[];
+  trades: TradeData[];
+  liveOhlcv?: OHLCDataLive[];
   children?: React.ReactNode;
 }
 
@@ -322,4 +335,24 @@ interface PoolData {
   address: string;
   name: string;
   network: string;
+  attributes: {
+    address: string;
+  };
 }
+
+interface TradeAttributes {
+  from_token_amount: number;
+  price_from_in_usd: number;
+  block_timestamp: number;
+  kind: string;
+  volume_in_usd: number;
+}
+
+interface TradeData {
+  id: string;
+  attributes: TradeAttributes;
+}
+
+// interface TradeDataResponse {
+//   data: TradeData[];
+// }
