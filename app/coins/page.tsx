@@ -1,11 +1,11 @@
 import { fetcher } from "@/lib/coingecko.actions";
-
 import Image from "next/image";
 import Link from "next/link";
-
 import { cn, formatPercentage, formatCurrency } from "@/lib/utils";
 import DataTable from "@/components/data-table";
 import CoinsPagination from "@/components/coins-pagination";
+
+export const dynamic = "force-dynamic";
 
 const Coins = async ({ searchParams }: NextPageProps) => {
   const { page } = await searchParams;

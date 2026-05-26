@@ -11,7 +11,7 @@ if (!API_KEY) throw new Error("Could not get api key");
 export async function fetcher<T>(
   endpoint: string,
   params?: QueryParams,
-  revalidate = 60,
+  revalidate = 0,
 ): Promise<T> {
   const url = qs.stringifyUrl(
     {
@@ -27,6 +27,7 @@ export async function fetcher<T>(
       "Content-Type": "application/json",
     } as Record<string, string>,
     next: { revalidate },
+    cache: "no-cache",
   });
 
   if (!response.ok) {
@@ -77,5 +78,65 @@ export async function getPools(
     return poolData.data?.[0] ?? fallback;
   } catch {
     return fallback;
+  }
+}
+
+export async function searchCoins(query: string): Promise<SearchCoin[]> {
+  const fallback: SearchCoin = {
+    id: "",
+    name: "",
+    symbol: "",
+    market_cap_rank: 0,
+    thumb: "",
+    large: "",
+    data: {
+      price: 0,
+      price_change_percentage_24h: 0,
+    },
+  };
+
+  const convertQueryToLowerCase = query.toLowerCase();
+
+  try {
+    const searchCoinList = await fetcher<{ coins: SearchCoin[] }>("/search", {
+      query: convertQueryToLowerCase,
+    });
+
+    const top10Coins = searchCoinList.coins.slice(0, 10);
+
+    const top10CoinIds = top10Coins.map((coin: SearchCoin) => coin.id);
+
+    const convertedIds = top10CoinIds.join(",");
+
+    const coinsMarketData = await fetcher<CoinMarketData[]>("/coins/markets", {
+      vs_currency: "usd",
+      ids: convertedIds,
+    });
+
+    // const priceMap = new Map(
+    //   coinsMarketData.map((coin: CoinMarketData) => [
+    //     coin.id,
+    //     {
+    //       price: coin.current_price,
+    //       price_change_percentage_24h: coin.price_change_percentage_24h,
+    //     },
+    //   ]),
+    // );
+
+    const top10CoinPrices = coinsMarketData.map((coin: CoinMarketData) => ({
+      price: coin.current_price,
+      price_change_percentage_24h: coin.price_change_percentage_24h,
+    }));
+
+    const mergedCoins = top10Coins.map((coin: SearchCoin, idx: number) => ({
+      ...coin,
+      data: {
+        ...top10CoinPrices[idx],
+      },
+    }));
+
+    return mergedCoins;
+  } catch (error) {
+    return [fallback];
   }
 }

@@ -8,6 +8,8 @@ import {
 import { Suspense } from "react";
 import Categories from "@/components/home/categories";
 
+export const dynamic = "force-dynamic";
+
 const Home = async () => {
   return (
     <>

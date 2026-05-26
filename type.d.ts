@@ -84,6 +84,10 @@ interface CoinMarketData {
   last_updated: string;
 }
 
+interface CoinMarketDataResponse {
+  topGainersLosers: CoinMarketData[];
+}
+
 interface TrendingCoin {
   item: {
     id: string;
@@ -356,3 +360,18 @@ interface TradeData {
 // interface TradeDataResponse {
 //   data: TradeData[];
 // }
+
+interface ExchangeListings {
+  base: string;
+  target: string;
+  market: {
+    name: string;
+  };
+  last: number;
+  last_traded_at: string;
+  trade_url: string;
+}
+
+interface ExchangeListingsProps {
+  exchangeListingsData: ExchangeListings[];
+}

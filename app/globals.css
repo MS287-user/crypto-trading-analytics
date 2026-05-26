@@ -542,7 +542,7 @@
       }
 
       .time-cell {
-        @apply pr-5 text-end;
+        @apply pr-5 text-end!;
       }
     }
 
@@ -763,7 +763,7 @@
     }
 
     .tabs-trigger {
-      @apply data-[state=active]:border-none! data-[state=active]:bg-transparent! flex justify-start! mb-0! py-2! text-lg! font-semibold! md:text-2xl!;
+      @apply data-[state=active]:border-none! data-[state=active]:bg-transparent! data-[state=active]:text-white! flex justify-start! mb-0! py-2! text-lg! font-semibold! md:text-2xl!;
     }
 
     .tabs-content {

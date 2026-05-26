@@ -114,6 +114,10 @@ const LiveDataWrapper = ({
             />
           </div>
         )}
+
+        <Separator className="divider" />
+
+        <div>{children}</div>
       </section>
     </>
   );

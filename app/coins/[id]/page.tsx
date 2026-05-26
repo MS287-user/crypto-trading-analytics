@@ -1,29 +1,40 @@
 import Converter from "@/components/converter";
+import ExchangeListings from "@/components/exchange-listings";
 import LiveDataWrapper from "@/components/live-data-wrapper";
+import TopGainersLosers from "@/components/top-gainers-losers";
 import { fetcher, getPools } from "@/lib/coingecko.actions";
 import { formatCurrency } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 const Page = async ({ params }: NextPageProps) => {
   const { id } = await params;
 
-  const [coinData, coinOHLCData] = await Promise.all([
-    fetcher<CoinDetailsData>(`/coins/${id}`, {
-      dex_pair_format: "contract_address",
-    }),
-    fetcher<OHLCData[]>(`/coins/${id}/ohlc`, {
-      vs_currency: "usd",
-      days: "1",
-      precision: "full",
-    }),
-  ]);
+  const [coinData, coinOHLCData, exchangeListingsData, topGainersLosers] =
+    await Promise.all([
+      fetcher<CoinDetailsData>(`/coins/${id}`, {
+        dex_pair_format: "symbol",
+      }),
+      fetcher<OHLCData[]>(`/coins/${id}/ohlc`, {
+        vs_currency: "usd",
+        days: "1",
+        precision: "full",
+      }),
+      fetcher<{ tickers: ExchangeListings[] }>(`/coins/${id}/tickers`),
+      fetcher<CoinMarketData[]>("/coins/markets", {
+        vs_currency: "usd",
+        order: "market_cap_desc",
+        price_change_percentage: "1h",
+      }),
+    ]);
 
   const platform = coinData.asset_platform_id
     ? coinData.detail_platforms?.[coinData.asset_platform_id]
     : null;
 
-  const network = platform?.geckoterminal_url.split("/")[3] || null;
+  const network = platform?.geckoterminal_url?.split("/")[3] || null;
 
   const contractAddress = platform?.contract_address || null;
 
@@ -87,7 +98,9 @@ const Page = async ({ params }: NextPageProps) => {
             trades={trades.data}
             liveOhlcv={liveOhlcv.data.attributes.ohlcv_list}
           >
-            <h4>Exchange Listings</h4>
+            <ExchangeListings
+              exchangeListingsData={exchangeListingsData.tickers.slice(0, 7)}
+            />
           </LiveDataWrapper>
         </section>
 
@@ -120,7 +133,7 @@ const Page = async ({ params }: NextPageProps) => {
             </ul>
           </div>
 
-          <p>Top Gainers and Losers</p>
+          <TopGainersLosers topGainersLosers={topGainersLosers} />
         </section>
       </main>
     </>
